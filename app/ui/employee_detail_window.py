@@ -38,6 +38,7 @@ class EmployeeDetailWindow(QDialog):
 
         self.employee_id = employee_id
         self.employee_details: Optional[EmployeeDetails] = None
+        
         self.kpi_records: list[EmployeeKpiRecordItem] = []
 
         self.setWindowTitle("KPI Monitor ML — карточка сотрудника")
