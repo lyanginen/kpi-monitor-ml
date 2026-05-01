@@ -26,6 +26,7 @@ from PySide6.QtWidgets import (
 
 from app.services.auth_service import AuthenticatedUser
 from app.services.permission_service import get_available_sections
+from app.ui.employee_list_window import EmployeeListWindow
 
 
 class MainWindow(QMainWindow):
@@ -77,9 +78,7 @@ class MainWindow(QMainWindow):
         exit_action.triggered.connect(self.close)
 
         employees_action = data_menu.addAction("Сотрудники")
-        employees_action.triggered.connect(
-            lambda: self._show_section_stub("Сотрудники")
-        )
+        employees_action.triggered.connect(self._open_employees_window)
 
         kpi_action = data_menu.addAction("KPI-записи")
         kpi_action.triggered.connect(
@@ -152,9 +151,7 @@ class MainWindow(QMainWindow):
         for section_name in available_sections:
             self.sections_list.addItem(section_name)
 
-        self.sections_list.itemClicked.connect(
-            lambda item: self._show_section_stub(item.text())
-        )
+        self.sections_list.itemClicked.connect(self._handle_section_click)
 
         logout_button = QPushButton("Выйти")
         logout_button.clicked.connect(self.close)
@@ -200,6 +197,27 @@ class MainWindow(QMainWindow):
         content.setLayout(content_layout)
 
         return content
+    
+    def _handle_section_click(self, item) -> None:
+        """
+        Обрабатывает нажатие на раздел в левом меню.
+        """
+        section_name = item.text()
+
+        if section_name in ["Сотрудники", "Сотрудники отдела"]:
+            self._open_employees_window()
+            return
+
+        self._show_section_stub(section_name)
+
+    def _open_employees_window(self) -> None:
+        """
+        Открывает окно списка сотрудников.
+
+        Список сотрудников будет показан с учетом роли текущего пользователя.
+        """
+        employees_window = EmployeeListWindow(self.current_user)
+        employees_window.exec()
 
     def _show_section_stub(self, section_name: str) -> None:
         """

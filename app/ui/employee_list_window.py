@@ -6,6 +6,8 @@
 сотрудник — только собственную карточку.
 """
 
+from typing import Optional
+
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QDialog,
@@ -21,6 +23,8 @@ from PySide6.QtWidgets import (
 from app.database.connection import SessionLocal
 from app.services.auth_service import AuthenticatedUser
 from app.services.employee_service import EmployeeListItem, EmployeeService
+from app.ui.employee_detail_window import EmployeeDetailWindow
+
 
 
 class EmployeeListWindow(QDialog):
@@ -140,7 +144,7 @@ class EmployeeListWindow(QDialog):
         item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.table.setItem(row, column, item)
 
-    def _get_selected_employee_id(self) -> int | None:
+    def _get_selected_employee_id(self) -> Optional[int]:
         """
         Возвращает ID выбранного сотрудника.
         """
@@ -160,8 +164,6 @@ class EmployeeListWindow(QDialog):
     def _open_selected_employee(self) -> None:
         """
         Открывает карточку выбранного сотрудника.
-
-        На этом этапе карточка будет подключена следующим коммитом.
         """
         employee_id = self._get_selected_employee_id()
 
@@ -173,9 +175,5 @@ class EmployeeListWindow(QDialog):
             )
             return
 
-        QMessageBox.information(
-            self,
-            "Карточка сотрудника",
-            f"Выбран сотрудник с ID: {employee_id}.\n"
-            "Полная карточка сотрудника будет подключена следующим шагом.",
-        )
+        detail_window = EmployeeDetailWindow(employee_id)
+        detail_window.exec()
