@@ -28,6 +28,7 @@ from app.services.auth_service import AuthenticatedUser
 from app.services.permission_service import get_available_sections
 from app.ui.employee_list_window import EmployeeListWindow
 from app.ui.kpi_list_window import KpiListWindow
+from app.ui.analytics_window import AnalyticsWindow
 
 
 class MainWindow(QMainWindow):
@@ -83,6 +84,9 @@ class MainWindow(QMainWindow):
 
         kpi_action = data_menu.addAction("KPI-записи")
         kpi_action.triggered.connect(self._open_kpi_window)
+
+        analytics_action = data_menu.addAction("Аналитика KPI")
+        analytics_action.triggered.connect(self._open_analytics_window)
 
         train_model_action = ml_menu.addAction("Обучение модели")
         train_model_action.triggered.connect(
@@ -210,6 +214,10 @@ class MainWindow(QMainWindow):
         if section_name in ["KPI-записи", "Мои KPI"]:
             self._open_kpi_window()
             return
+        
+        if section_name in ["Аналитика KPI", "Аналитика отдела"]:
+            self._open_analytics_window()
+            return
 
         self._show_section_stub(section_name)
 
@@ -221,7 +229,7 @@ class MainWindow(QMainWindow):
         """
         employees_window = EmployeeListWindow(self.current_user)
         employees_window.exec()
-        
+
     def _open_kpi_window(self) -> None:
         """
         Открывает окно KPI-записей.
@@ -230,6 +238,15 @@ class MainWindow(QMainWindow):
         """
         kpi_window = KpiListWindow(self.current_user)
         kpi_window.exec()
+
+    def _open_analytics_window(self) -> None:
+        """
+        Открывает окно аналитики KPI.
+
+        Аналитика строится с учетом роли текущего пользователя.
+        """
+        analytics_window = AnalyticsWindow(self.current_user)
+        analytics_window.exec()
 
     def _show_section_stub(self, section_name: str) -> None:
         """
