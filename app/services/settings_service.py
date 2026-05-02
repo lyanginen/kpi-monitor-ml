@@ -24,6 +24,11 @@ BACKUPS_DIR = EXPORTS_DIR / "backups"
 EXPORTS_DIR.mkdir(exist_ok=True)
 BACKUPS_DIR.mkdir(exist_ok=True)
 
+HIDDEN_SETTING_KEYS = {
+    "author_name",
+    "application_theme",
+}
+
 
 @dataclass
 class AppSettingItem:
@@ -55,11 +60,22 @@ class SettingsService:
         """
         Возвращает список настроек приложения.
         """
-        settings = (
-            self.session.query(AppSetting)
-            .order_by(AppSetting.setting_key)
-            .all()
-        )
+        query = self.session.query(AppSetting)
+
+        for hidden_key in HIDDEN_SETTING_KEYS:
+            query = query.filter(AppSetting.setting_key != hidden_key)
+
+        settings = query.order_by(AppSetting.setting_key).all()
+
+        return [
+            AppSettingItem(
+                id=setting.id,
+                setting_key=setting.setting_key,
+                setting_value=setting.setting_value,
+                description=setting.description or "",
+            )
+            for setting in settings
+        ]
 
         return [
             AppSettingItem(
@@ -92,6 +108,9 @@ class SettingsService:
 
         Если настройки с таким ключом нет, она будет создана.
         """
+        if setting_key in HIDDEN_SETTING_KEYS:
+            raise ValueError("Эта настройка является служебной и не может изменяться из интерфейса.")
+
         setting = (
             self.session.query(AppSetting)
             .filter(AppSetting.setting_key == setting_key)
