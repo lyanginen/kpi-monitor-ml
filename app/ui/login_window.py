@@ -21,6 +21,7 @@ from PySide6.QtWidgets import (
 
 from app.database.connection import SessionLocal
 from app.services.auth_service import AuthService, AuthenticatedUser
+from app.services.audit_service import AuditService
 
 
 class LoginWindow(QDialog):
@@ -117,6 +118,15 @@ class LoginWindow(QDialog):
                     "Неверный логин, пароль или учетная запись отключена.",
                 )
                 return
+
+            audit_service = AuditService(session)
+            audit_service.log_action(
+                user_id=user.id,
+                action="Успешная авторизация",
+                entity_name="User",
+                entity_id=user.id,
+                details=f"Пользователь {user.username} выполнил вход в систему.",
+            )
 
             self.authenticated_user = user
             self.accept()

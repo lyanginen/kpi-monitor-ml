@@ -35,6 +35,7 @@ from app.ui.help_window import HelpWindow
 from app.ui.settings_window import SettingsWindow
 from app.ui.admin_users_window import AdminUsersWindow
 from app.ui.personal_account_window import PersonalAccountWindow
+from app.ui.audit_log_window import AuditLogWindow
 
 
 class MainWindow(QMainWindow):
@@ -97,6 +98,9 @@ class MainWindow(QMainWindow):
 
         users_action = data_menu.addAction("Пользователи")
         users_action.triggered.connect(self._open_admin_users_window)
+
+        audit_log_action = data_menu.addAction("Журнал действий")
+        audit_log_action.triggered.connect(self._open_audit_log_window)
 
         personal_account_action = data_menu.addAction("Личный кабинет")
         personal_account_action.triggered.connect(self._open_personal_account_window)
@@ -265,6 +269,10 @@ class MainWindow(QMainWindow):
         if section_name == "Личный кабинет":
             self._open_personal_account_window()
             return
+        
+        if section_name == "Журнал действий":
+            self._open_audit_log_window()
+            return
 
         self._show_section_stub(section_name)
 
@@ -325,6 +333,23 @@ class MainWindow(QMainWindow):
 
         admin_window = AdminUsersWindow(self.current_user)
         admin_window.exec()
+
+    def _open_audit_log_window(self) -> None:
+        """
+        Открывает журнал действий пользователей.
+
+        Если пользователь не является администратором, раздел не открывается.
+        """
+        if not self.current_user.is_admin():
+            QMessageBox.warning(
+                self,
+                "Доступ запрещен",
+                "Журнал действий доступен только пользователю с ролью Администратор.",
+            )
+            return
+
+        audit_log_window = AuditLogWindow(self.current_user)
+        audit_log_window.exec()
 
     def _open_personal_account_window(self) -> None:
         """

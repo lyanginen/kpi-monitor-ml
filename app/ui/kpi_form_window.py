@@ -24,6 +24,7 @@ from PySide6.QtWidgets import (
 from app.database.connection import SessionLocal
 from app.services.auth_service import AuthenticatedUser
 from app.services.kpi_service import KpiService
+from app.services.audit_service import AuditService
 
 
 class KpiFormWindow(QDialog):
@@ -187,7 +188,7 @@ class KpiFormWindow(QDialog):
 
         try:
             service = KpiService(session)
-            service.create_kpi_record(
+            created_record = service.create_kpi_record(
                 employee_id=employee_id,
                 indicator_id=indicator_id,
                 period_start=period_start,
@@ -195,6 +196,15 @@ class KpiFormWindow(QDialog):
                 actual_value=actual_value,
                 target_value=target_value,
                 comment=comment,
+            )
+
+            audit_service = AuditService(session)
+            audit_service.log_action(
+                user_id=self.current_user.id,
+                action="Создание KPI-записи",
+                entity_name="KpiRecord",
+                entity_id=created_record.id,
+                details="Пользователь создал новую KPI-запись через форму приложения.",
             )
 
         except ValueError as error:
