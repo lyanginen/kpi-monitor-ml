@@ -26,6 +26,7 @@ from app.database.connection import SessionLocal
 from app.services.auth_service import AuthenticatedUser
 from app.services.ml_service import MlService
 from app.services.permission_service import can_train_ml_model
+from app.services.audit_service import AuditService
 
 
 class MlWindow(QDialog):
@@ -174,6 +175,18 @@ class MlWindow(QDialog):
             service = MlService(session)
             result = service.train_model()
 
+            audit_service = AuditService(session)
+            audit_service.log_action(
+                user_id=self.current_user.id,
+                action="Обучение ML-модели",
+                entity_name="MlModelInfo",
+                entity_id=result.model_id,
+                details=(
+                    f"Обучена модель RandomForestClassifier. "
+                    f"Accuracy={result.accuracy:.4f}, F1={result.f1:.4f}."
+                ),
+            )
+
         except Exception as error:
             QMessageBox.critical(
                 self,
@@ -214,6 +227,15 @@ class MlWindow(QDialog):
         try:
             service = MlService(session)
             predictions = service.predict_for_employees()
+
+            audit_service = AuditService(session)
+            audit_service.log_action(
+                user_id=self.current_user.id,
+                action="Выполнение ML-прогноза",
+                entity_name="MlPrediction",
+                entity_id=None,
+                details=f"Выполнен прогноз риска KPI для сотрудников: {len(predictions)} записей.",
+            )
 
         except Exception as error:
             QMessageBox.critical(
