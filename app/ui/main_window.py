@@ -31,6 +31,8 @@ from app.ui.kpi_list_window import KpiListWindow
 from app.ui.analytics_window import AnalyticsWindow
 from app.ui.ml_window import MlWindow
 from app.ui.reports_window import ReportsWindow
+from app.ui.help_window import HelpWindow
+from app.ui.settings_window import SettingsWindow
 
 
 class MainWindow(QMainWindow):
@@ -76,6 +78,7 @@ class MainWindow(QMainWindow):
         data_menu = menu_bar.addMenu("Данные")
         ml_menu = menu_bar.addMenu("ML-анализ")
         reports_menu = menu_bar.addMenu("Отчеты")
+        settings_menu = menu_bar.addMenu("Настройки")
         help_menu = menu_bar.addMenu("Справка")
 
         exit_action = file_menu.addAction("Выход")
@@ -101,6 +104,24 @@ class MainWindow(QMainWindow):
 
         xlsx_report_action = reports_menu.addAction("Сформировать XLSX")
         xlsx_report_action.triggered.connect(self._open_reports_window)
+
+        settings_action = settings_menu.addAction("Панель настроек")
+        settings_action.triggered.connect(self._open_settings_window)
+
+        backup_action = settings_menu.addAction("Резервное копирование БД")
+        backup_action.triggered.connect(self._open_settings_window)
+
+        data_folder_action = settings_menu.addAction("Рабочие папки")
+        data_folder_action.triggered.connect(self._open_settings_window)
+
+        app_parameters_action = settings_menu.addAction("Параметры приложения")
+        app_parameters_action.triggered.connect(self._open_settings_window)
+
+        model_parameters_action = settings_menu.addAction("Параметры ML-модели")
+        model_parameters_action.triggered.connect(self._open_settings_window)
+
+        help_action = help_menu.addAction("Справка по системе")
+        help_action.triggered.connect(self._open_help_window)
 
         about_action = help_menu.addAction("О системе")
         about_action.triggered.connect(self._show_about_dialog)
@@ -220,6 +241,14 @@ class MainWindow(QMainWindow):
         if section_name in ["Отчеты", "Мои отчеты"]:
             self._open_reports_window()
             return
+        
+        if section_name == "Настройки":
+            self._open_settings_window()
+            return
+
+        if section_name == "Справка":
+            self._open_help_window()
+            return
 
         self._show_section_stub(section_name)
 
@@ -263,6 +292,20 @@ class MainWindow(QMainWindow):
         """
         reports_window = ReportsWindow(self.current_user)
         reports_window.exec()
+
+    def _open_settings_window(self) -> None:
+        """
+        Открывает окно настроек приложения.
+        """
+        settings_window = SettingsWindow(self.current_user)
+        settings_window.exec()
+
+    def _open_help_window(self) -> None:
+        """
+        Открывает окно справки по системе.
+        """
+        help_window = HelpWindow(self.current_user)
+        help_window.exec()
 
     def _show_section_stub(self, section_name: str) -> None:
         """
