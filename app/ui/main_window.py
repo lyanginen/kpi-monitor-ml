@@ -33,6 +33,8 @@ from app.ui.ml_window import MlWindow
 from app.ui.reports_window import ReportsWindow
 from app.ui.help_window import HelpWindow
 from app.ui.settings_window import SettingsWindow
+from app.ui.admin_users_window import AdminUsersWindow
+from app.ui.personal_account_window import PersonalAccountWindow
 
 
 class MainWindow(QMainWindow):
@@ -92,6 +94,12 @@ class MainWindow(QMainWindow):
 
         analytics_action = data_menu.addAction("Аналитика KPI")
         analytics_action.triggered.connect(self._open_analytics_window)
+
+        users_action = data_menu.addAction("Пользователи")
+        users_action.triggered.connect(self._open_admin_users_window)
+
+        personal_account_action = data_menu.addAction("Личный кабинет")
+        personal_account_action.triggered.connect(self._open_personal_account_window)
 
         train_model_action = ml_menu.addAction("Обучение модели")
         train_model_action.triggered.connect(self._open_ml_window)
@@ -249,6 +257,14 @@ class MainWindow(QMainWindow):
         if section_name == "Справка":
             self._open_help_window()
             return
+        
+        if section_name == "Пользователи":
+            self._open_admin_users_window()
+            return
+
+        if section_name == "Личный кабинет":
+            self._open_personal_account_window()
+            return
 
         self._show_section_stub(section_name)
 
@@ -292,6 +308,30 @@ class MainWindow(QMainWindow):
         """
         reports_window = ReportsWindow(self.current_user)
         reports_window.exec()
+    
+    def _open_admin_users_window(self) -> None:
+        """
+        Открывает админ-панель пользователей.
+
+        Если пользователь не является администратором, раздел не открывается.
+        """
+        if not self.current_user.is_admin():
+            QMessageBox.warning(
+                self,
+                "Доступ запрещен",
+                "Админ-панель доступна только пользователю с ролью Администратор.",
+            )
+            return
+
+        admin_window = AdminUsersWindow(self.current_user)
+        admin_window.exec()
+
+    def _open_personal_account_window(self) -> None:
+        """
+        Открывает личный кабинет текущего пользователя.
+        """
+        personal_account_window = PersonalAccountWindow(self.current_user)
+        personal_account_window.exec()
 
     def _open_settings_window(self) -> None:
         """
