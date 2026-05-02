@@ -29,6 +29,7 @@ from app.services.permission_service import get_available_sections
 from app.ui.employee_list_window import EmployeeListWindow
 from app.ui.kpi_list_window import KpiListWindow
 from app.ui.analytics_window import AnalyticsWindow
+from app.ui.ml_window import MlWindow
 
 
 class MainWindow(QMainWindow):
@@ -89,14 +90,10 @@ class MainWindow(QMainWindow):
         analytics_action.triggered.connect(self._open_analytics_window)
 
         train_model_action = ml_menu.addAction("Обучение модели")
-        train_model_action.triggered.connect(
-            lambda: self._show_section_stub("Обучение ML-модели")
-        )
+        train_model_action.triggered.connect(self._open_ml_window)
 
         prediction_action = ml_menu.addAction("Прогноз KPI")
-        prediction_action.triggered.connect(
-            lambda: self._show_section_stub("ML-прогноз KPI")
-        )
+        prediction_action.triggered.connect(self._open_ml_window)
 
         docx_report_action = reports_menu.addAction("Сформировать DOCX")
         docx_report_action.triggered.connect(
@@ -218,6 +215,10 @@ class MainWindow(QMainWindow):
         if section_name in ["Аналитика KPI", "Аналитика отдела"]:
             self._open_analytics_window()
             return
+        
+        if section_name in ["ML-анализ", "ML-прогнозы", "Мой ML-прогноз"]:
+            self._open_ml_window()
+            return
 
         self._show_section_stub(section_name)
 
@@ -247,6 +248,13 @@ class MainWindow(QMainWindow):
         """
         analytics_window = AnalyticsWindow(self.current_user)
         analytics_window.exec()
+
+    def _open_ml_window(self) -> None:
+        """
+        Открывает окно ML-анализа и прогноза KPI.
+        """
+        ml_window = MlWindow(self.current_user)
+        ml_window.exec()
 
     def _show_section_stub(self, section_name: str) -> None:
         """
