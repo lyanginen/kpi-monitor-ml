@@ -25,6 +25,7 @@ from PySide6.QtWidgets import (
 from app.database.connection import SessionLocal
 from app.services.admin_service import AdminService
 from app.services.auth_service import AuthenticatedUser
+from app.services.audit_service import AuditService
 
 
 class AdminUsersWindow(QDialog):
@@ -191,6 +192,16 @@ class AdminUsersWindow(QDialog):
         try:
             service = AdminService(session)
             service.set_user_active(user_id, is_active)
+
+            audit_service = AuditService(session)
+            action_text = "Активация пользователя" if is_active else "Отключение пользователя"
+            audit_service.log_action(
+                user_id=self.current_user.id,
+                action=action_text,
+                entity_name="User",
+                entity_id=user_id,
+                details=f"Изменен статус активности пользователя с ID={user_id}.",
+            )
 
         except Exception as error:
             QMessageBox.critical(
