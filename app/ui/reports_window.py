@@ -27,6 +27,7 @@ from PySide6.QtWidgets import (
 from app.database.connection import SessionLocal
 from app.services.auth_service import AuthenticatedUser
 from app.services.report_service import EXPORTS_DIR, ReportService
+from app.services.audit_service import AuditService
 
 
 class ReportsWindow(QDialog):
@@ -121,6 +122,15 @@ class ReportsWindow(QDialog):
             service = ReportService(session)
             result = service.generate_kpi_docx_report(self.current_user)
 
+            audit_service = AuditService(session)
+            audit_service.log_action(
+                user_id=self.current_user.id,
+                action="Формирование DOCX-отчета",
+                entity_name="Report",
+                entity_id=None,
+                details=f"Сформирован DOCX-отчет: {result.file_path}",
+            )
+
         except Exception as error:
             QMessageBox.critical(
                 self,
@@ -149,6 +159,15 @@ class ReportsWindow(QDialog):
         try:
             service = ReportService(session)
             result = service.generate_analytics_xlsx_report(self.current_user)
+
+            audit_service = AuditService(session)
+            audit_service.log_action(
+                user_id=self.current_user.id,
+                action="Формирование XLSX-отчета",
+                entity_name="Report",
+                entity_id=None,
+                details=f"Сформирован XLSX-отчет: {result.file_path}",
+            )
 
         except Exception as error:
             QMessageBox.critical(
