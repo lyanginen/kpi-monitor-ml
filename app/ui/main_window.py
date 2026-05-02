@@ -30,6 +30,7 @@ from app.ui.employee_list_window import EmployeeListWindow
 from app.ui.kpi_list_window import KpiListWindow
 from app.ui.analytics_window import AnalyticsWindow
 from app.ui.ml_window import MlWindow
+from app.ui.reports_window import ReportsWindow
 
 
 class MainWindow(QMainWindow):
@@ -96,14 +97,10 @@ class MainWindow(QMainWindow):
         prediction_action.triggered.connect(self._open_ml_window)
 
         docx_report_action = reports_menu.addAction("Сформировать DOCX")
-        docx_report_action.triggered.connect(
-            lambda: self._show_section_stub("Формирование DOCX-отчета")
-        )
+        docx_report_action.triggered.connect(self._open_reports_window)
 
         xlsx_report_action = reports_menu.addAction("Сформировать XLSX")
-        xlsx_report_action.triggered.connect(
-            lambda: self._show_section_stub("Формирование XLSX-отчета")
-        )
+        xlsx_report_action.triggered.connect(self._open_reports_window)
 
         about_action = help_menu.addAction("О системе")
         about_action.triggered.connect(self._show_about_dialog)
@@ -219,6 +216,10 @@ class MainWindow(QMainWindow):
         if section_name in ["ML-анализ", "ML-прогнозы", "Мой ML-прогноз"]:
             self._open_ml_window()
             return
+        
+        if section_name in ["Отчеты", "Мои отчеты"]:
+            self._open_reports_window()
+            return
 
         self._show_section_stub(section_name)
 
@@ -255,6 +256,13 @@ class MainWindow(QMainWindow):
         """
         ml_window = MlWindow(self.current_user)
         ml_window.exec()
+
+    def _open_reports_window(self) -> None:
+        """
+        Открывает окно формирования отчетов.
+        """
+        reports_window = ReportsWindow(self.current_user)
+        reports_window.exec()
 
     def _show_section_stub(self, section_name: str) -> None:
         """
