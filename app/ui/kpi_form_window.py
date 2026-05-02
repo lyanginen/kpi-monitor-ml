@@ -198,6 +198,7 @@ class KpiFormWindow(QDialog):
                 comment=comment,
             )
 
+
             audit_service = AuditService(session)
             audit_service.log_action(
                 user_id=self.current_user.id,
