@@ -27,6 +27,7 @@ from PySide6.QtWidgets import (
 from app.services.auth_service import AuthenticatedUser
 from app.services.permission_service import get_available_sections
 from app.ui.employee_list_window import EmployeeListWindow
+from app.ui.kpi_list_window import KpiListWindow
 
 
 class MainWindow(QMainWindow):
@@ -81,9 +82,7 @@ class MainWindow(QMainWindow):
         employees_action.triggered.connect(self._open_employees_window)
 
         kpi_action = data_menu.addAction("KPI-записи")
-        kpi_action.triggered.connect(
-            lambda: self._show_section_stub("KPI-записи")
-        )
+        kpi_action.triggered.connect(self._open_kpi_window)
 
         train_model_action = ml_menu.addAction("Обучение модели")
         train_model_action.triggered.connect(
@@ -208,6 +207,10 @@ class MainWindow(QMainWindow):
             self._open_employees_window()
             return
 
+        if section_name in ["KPI-записи", "Мои KPI"]:
+            self._open_kpi_window()
+            return
+
         self._show_section_stub(section_name)
 
     def _open_employees_window(self) -> None:
@@ -218,6 +221,15 @@ class MainWindow(QMainWindow):
         """
         employees_window = EmployeeListWindow(self.current_user)
         employees_window.exec()
+        
+    def _open_kpi_window(self) -> None:
+        """
+        Открывает окно KPI-записей.
+
+        Данные будут показаны с учетом роли текущего пользователя.
+        """
+        kpi_window = KpiListWindow(self.current_user)
+        kpi_window.exec()
 
     def _show_section_stub(self, section_name: str) -> None:
         """

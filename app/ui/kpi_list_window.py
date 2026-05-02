@@ -25,6 +25,7 @@ from app.database.connection import SessionLocal
 from app.services.auth_service import AuthenticatedUser
 from app.services.kpi_service import KpiRecordListItem, KpiService
 from app.services.permission_service import can_manage_kpi
+from app.ui.kpi_form_window import KpiFormWindow
 
 
 class KpiListWindow(QDialog):
@@ -145,10 +146,12 @@ class KpiListWindow(QDialog):
 
     def _open_add_kpi_stub(self) -> None:
         """
-        Временная заглушка открытия формы добавления KPI.
+        Открывает форму добавления KPI-записи.
+
+        После успешного сохранения список KPI автоматически обновляется.
         """
-        QMessageBox.information(
-            self,
-            "Добавление KPI",
-            "Форма добавления KPI будет подключена следующим коммитом.",
-        )
+        form_window = KpiFormWindow(self.current_user)
+        result = form_window.exec()
+
+        if result == QDialog.Accepted:
+            self._load_kpi_records()
