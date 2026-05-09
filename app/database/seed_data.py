@@ -478,7 +478,7 @@ def create_settings(session):
         },
         {
             "setting_key": "author_name",
-            "setting_value": "Указать ФИО автора",
+            "setting_value": "Лянгинен Илья Борисович",
             "description": "ФИО автора выпускной квалификационной работы.",
         },
     ]
