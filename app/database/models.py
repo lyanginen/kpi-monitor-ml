@@ -63,6 +63,7 @@ class User(Base):
 
     role = relationship("Role", back_populates="users")
     employee = relationship("Employee", back_populates="user", uselist=False)
+    audit_logs = relationship("AuditLog", back_populates="user")
 
 
 class Department(Base):
@@ -290,3 +291,4 @@ class AuditLog(Base):
     entity_id = Column(Integer, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     details = Column(Text, nullable=True)
+    user = relationship("User", back_populates="audit_logs")
